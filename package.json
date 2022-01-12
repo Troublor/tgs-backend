@@ -1,6 +1,6 @@
 {
   "name": "tgs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The backend of Troublor General Server",
   "author": "William Aaron Cheung",
   "private": true,
