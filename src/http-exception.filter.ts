@@ -5,10 +5,7 @@ import {
   ArgumentsHost,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
 import { ConfigService } from '@nestjs/config';
-import { appRoot } from './config/loader';
 
 @Catch(HttpException)
 export default class HttpExceptionFilter
@@ -25,30 +22,32 @@ export default class HttpExceptionFilter
     switch (status) {
       case 500:
         response.status(status).send(
-          fs.readFileSync(
-            path.join(
-              appRoot,
-              this.configService.get<string>('frontend.5xx') as string,
-              'index.html',
-            ),
-            {
-              encoding: 'utf-8',
-            },
-          ),
+          // fs.readFileSync(
+          //   path.join(
+          //     appRoot,
+          //     this.configService.get<string>('frontend.5xx') as string,
+          //     'index.html',
+          //   ),
+          //   {
+          //     encoding: 'utf-8',
+          //   },
+          // ),
+          'Internal Server Error',
         );
         break;
       case 404:
         response.status(status).send(
-          fs.readFileSync(
-            path.join(
-              appRoot,
-              this.configService.get<string>('frontend.4xx') as string,
-              'index.html',
-            ),
-            {
-              encoding: 'utf-8',
-            },
-          ),
+          // fs.readFileSync(
+          // path.join(
+          //   appRoot,
+          //   this.configService.get<string>('frontend.4xx') as string,
+          //   'index.html',
+          // ),
+          // {
+          //   encoding: 'utf-8',
+          // },
+          // ),
+          'Content Not Found',
         );
         break;
       default:
