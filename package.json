@@ -1,10 +1,10 @@
 {
   "name": "tgs",
   "version": "0.0.1",
-  "description": "This is the backend of Troublor General Server",
+  "description": "The backend of Troublor General Server",
   "author": "William Aaron Cheung",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
