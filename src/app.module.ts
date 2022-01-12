@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import AppController from './app.controller';
 import ToolsModule from './modules/tools/tools.module';
-import HomeModule from './modules/home/home.module';
 import { ConfigModule } from '@nestjs/config';
 import configLoader from './config/loader';
+import { FrontendModule } from './modules/frontend/frontend.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import configLoader from './config/loader';
       load: [configLoader],
       isGlobal: true,
     }),
-    HomeModule,
+    FrontendModule,
     ToolsModule,
   ],
   controllers: [AppController],

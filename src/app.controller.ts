@@ -1,10 +1,9 @@
-import { Controller, Get, Redirect } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-@Controller()
-export default class AppController {
-  @Get('/')
-  @Redirect('/profile')
-  getHome() {
-    return;
+@Controller('/')
+export class AppController {
+  @Get('/ping')
+  getPing(): string {
+    return 'Yes, you got it right!';
   }
 }

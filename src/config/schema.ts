@@ -8,9 +8,5 @@ export const configSchema = Joi.object({
     cert: Joi.string().default('ssl/troublor_xyz.crt'),
     ca: Joi.string().default('ssl/troublor_xyz.ca-bundle'),
   }),
-  frontend: Joi.object({
-    '4xx': Joi.string().default('dist/frontend/4xx'),
-    '5xx': Joi.string().default('dist/frontend/5xx'),
-    profile: Joi.string().default('dist/frontend/profile'),
-  }),
+  frontend: Joi.string().default('dist/frontend'),
 });

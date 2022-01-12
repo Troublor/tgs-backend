@@ -4,8 +4,11 @@ import {
   ExceptionFilter,
   ArgumentsHost,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import fs from 'fs';
+import path from 'path';
+import { appRoot } from './config/loader';
 
 @Catch(HttpException)
 export default class HttpExceptionFilter
@@ -16,47 +19,37 @@ export default class HttpExceptionFilter
   catch(exception: HttpException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
-    switch (status) {
-      case 500:
-        response.status(status).send(
-          // fs.readFileSync(
-          //   path.join(
-          //     appRoot,
-          //     this.configService.get<string>('frontend.5xx') as string,
-          //     'index.html',
-          //   ),
-          //   {
-          //     encoding: 'utf-8',
-          //   },
-          // ),
-          'Internal Server Error',
+    switch (Math.floor(status / 100)) {
+      case 4:
+        response.status(200).send(
+          fs.readFileSync(
+            path.join(
+              appRoot,
+              this.configService.get<string>('frontend') as string,
+              'index.html',
+            ),
+            {
+              encoding: 'utf-8',
+            },
+          ),
         );
         break;
-      case 404:
+      case 5:
         response.status(status).send(
-          // fs.readFileSync(
-          // path.join(
-          //   appRoot,
-          //   this.configService.get<string>('frontend.4xx') as string,
-          //   'index.html',
-          // ),
-          // {
-          //   encoding: 'utf-8',
-          // },
-          // ),
-          'Content Not Found',
+          fs.readFileSync(
+            path.join(
+              appRoot,
+              this.configService.get<string>('frontend') as string,
+              'index.html',
+            ),
+            {
+              encoding: 'utf-8',
+            },
+          ),
         );
         break;
-      default:
-        response.status(status).json({
-          statusCode: status,
-          timestamp: new Date().toISOString(),
-          path: request.url,
-          reason: exception.message,
-        });
     }
   }
 }
