@@ -1,4 +1,10 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Redirect } from '@nestjs/common';
 
 @Controller()
-export default class AppController {}
+export default class AppController {
+  @Get('/')
+  @Redirect('/profile')
+  getHome() {
+    return;
+  }
+}
