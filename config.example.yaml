@@ -1,0 +1,10 @@
+port: 80
+httpsPort: 443
+ssl:
+  key: ssl/troublor_xyz.key
+  cert: ssl/troublor_xyz.crt
+  ca: ssl/troublor_xyz.ca-bundle
+frontend:
+  4xx: dist/frontend/4xx
+  5xx: dist/frontend/5xx
+  profile: dist/frontend/profile
