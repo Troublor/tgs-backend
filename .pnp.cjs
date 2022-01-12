@@ -46,7 +46,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@nestjs/testing", "virtual:c334351955b38d24ac70c89cecde667a2c97924c4b8b184914f876b5dec7ffc604fb1e7e91a42c2b7b8cdac0fd5a3927ca75d7be0c8bc81532aedb72435a8d87#npm:8.2.5"],
             ["@types/esprima", "npm:4.0.3"],
             ["@types/express", "npm:4.17.13"],
-            ["@types/jest", "npm:27.0.2"],
+            ["@types/jest", "npm:27.4.0"],
             ["@types/js-yaml", "npm:4.0.5"],
             ["@types/lodash", "npm:4.14.178"],
             ["@types/node", "npm:17.0.8"],
@@ -1975,10 +1975,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@types/jest", [
-        ["npm:27.0.2", {
-          "packageLocation": "./.yarn/cache/@types-jest-npm-27.0.2-f9ba43c7f9-814ad5f5d2.zip/node_modules/@types/jest/",
+        ["npm:27.4.0", {
+          "packageLocation": "./.yarn/cache/@types-jest-npm-27.4.0-33755263ec-d2350267f9.zip/node_modules/@types/jest/",
           "packageDependencies": [
-            ["@types/jest", "npm:27.0.2"],
+            ["@types/jest", "npm:27.4.0"],
             ["jest-diff", "npm:27.4.6"],
             ["pretty-format", "npm:27.4.6"]
           ],
@@ -8549,7 +8549,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@nestjs/testing", "virtual:c334351955b38d24ac70c89cecde667a2c97924c4b8b184914f876b5dec7ffc604fb1e7e91a42c2b7b8cdac0fd5a3927ca75d7be0c8bc81532aedb72435a8d87#npm:8.2.5"],
             ["@types/esprima", "npm:4.0.3"],
             ["@types/express", "npm:4.17.13"],
-            ["@types/jest", "npm:27.0.2"],
+            ["@types/jest", "npm:27.4.0"],
             ["@types/js-yaml", "npm:4.0.5"],
             ["@types/lodash", "npm:4.14.178"],
             ["@types/node", "npm:17.0.8"],
@@ -8713,7 +8713,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/babel-jest", null],
             ["@types/babel__core", null],
             ["@types/esbuild", null],
-            ["@types/jest", "npm:27.0.2"],
+            ["@types/jest", "npm:27.4.0"],
             ["@types/typescript", null],
             ["babel-jest", null],
             ["bs-logger", "npm:0.2.6"],

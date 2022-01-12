@@ -1261,13 +1261,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:27.0.2":
-  version: 27.0.2
-  resolution: "@types/jest@npm:27.0.2"
+"@types/jest@npm:27.4.0":
+  version: 27.4.0
+  resolution: "@types/jest@npm:27.4.0"
   dependencies:
     jest-diff: ^27.0.0
     pretty-format: ^27.0.0
-  checksum: 814ad5f5d2f277849f47e52906da4b745758e555630fc8cb46a071bde648eefeffb1b35710c530a8cea7fc4ea7c1d813812c120484bf7902ab6c5e473cdd49c9
+  checksum: d2350267f954f9a2e4a15e5f02fbf19a77abfb9fd9e57a954de1fb0e9a0d3d5f8d3646ac7d9c42aeb4b4d828d2e70624ec149c85bb50a48634a54eed8429e1f8
   languageName: node
   linkType: hard
 
@@ -4820,7 +4820,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^27.2.5":
+"jest@npm:^27.4.7":
   version: 27.4.7
   resolution: "jest@npm:27.4.7"
   dependencies:
@@ -6856,7 +6856,7 @@ __metadata:
     "@nestjs/testing": ^8.0.0
     "@types/esprima": ^4
     "@types/express": ^4.17.13
-    "@types/jest": 27.0.2
+    "@types/jest": 27.4.0
     "@types/js-yaml": ^4
     "@types/lodash": ^4
     "@types/node": ^17.0.8
@@ -6872,7 +6872,7 @@ __metadata:
     eslint-plugin-prettier: ^4.0.0
     esprima: ^4.0.1
     express: ^4.17.2
-    jest: ^27.2.5
+    jest: ^27.4.7
     joi: ^17.5.0
     js-yaml: ^4.1.0
     lodash: ^4.17.21
