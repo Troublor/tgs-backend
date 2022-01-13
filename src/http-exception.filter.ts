@@ -21,35 +21,25 @@ export default class HttpExceptionFilter
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    switch (Math.floor(status / 100)) {
-      case 4:
-        response.status(200).send(
-          fs.readFileSync(
-            path.join(
-              appRoot,
-              this.configService.get<string>('frontend') as string,
-              'index.html',
-            ),
-            {
-              encoding: 'utf-8',
-            },
+    if (status == 404) {
+      response.status(200).send(
+        fs.readFileSync(
+          path.join(
+            appRoot,
+            this.configService.get<string>('frontend') as string,
+            'index.html',
           ),
-        );
-        break;
-      case 5:
-        response.status(status).send(
-          fs.readFileSync(
-            path.join(
-              appRoot,
-              this.configService.get<string>('frontend') as string,
-              'index.html',
-            ),
-            {
-              encoding: 'utf-8',
-            },
-          ),
-        );
-        break;
+          {
+            encoding: 'utf-8',
+          },
+        ),
+      );
+    } else {
+      response.status(status).send({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        message: exception.message,
+      });
     }
   }
 }

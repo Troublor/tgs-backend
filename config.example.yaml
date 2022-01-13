@@ -1,5 +1,11 @@
 port: 80
 httpsPort: 443
+log:
+  level: info
+  file: service.log
+notifier-bot:
+  token: 123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  userChatMap: userChatMap.json
 ssl:
   key: ssl/troublor_xyz.key
   cert: ssl/troublor_xyz.crt

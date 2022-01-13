@@ -41,3 +41,4 @@ lerna-debug.log*
 ssl/
 .env
 config.yaml
+userChatMap.json

@@ -1,22 +1,34 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   NotFoundException,
   Param,
   Post,
+  Req,
+  UseFilters,
 } from '@nestjs/common';
 import ToolsService from './tools.service';
 import axios from 'axios';
 import _ from 'lodash';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import RESTfulExceptionFilter from '../RESTful.middleware';
+import { Request } from 'express';
+import rawBody from 'raw-body';
 
 @Controller('tools')
+@ApiTags('tools')
+@UseFilters(RESTfulExceptionFilter)
 export default class ToolsController {
   constructor(private readonly toolsService: ToolsService) {}
 
-  @ApiTags('tools')
   @Get('bus/eta/:preset')
+  @ApiParam({
+    name: 'preset',
+    description: 'Bus preset',
+    enum: ['hkust2home', 'home2hkust'],
+  })
   async busETA(@Param('preset') p: string): Promise<string> {
     const presets: Record<
       string,
@@ -120,15 +132,22 @@ export default class ToolsController {
     );
   }
 
-  @ApiTags('tools')
   @Get('md5/:payload')
   getMd5(@Param('payload') payload: string): string {
     return this.toolsService.md5(payload);
   }
 
-  @ApiTags('tools')
   @Post('md5')
-  postMd5(@Body() payload: string): string {
-    return this.toolsService.md5(payload);
+  @ApiConsumes('text/plain')
+  async postMd5(@Body() payload: string, @Req() req: Request): Promise<string> {
+    if (!req.body) {
+      throw new BadRequestException(new Error('empty payload'));
+    }
+    const raw = await rawBody(req);
+    const text = raw.toString().trim();
+    if (text.length == 0) {
+      throw new BadRequestException(new Error('empty payload'));
+    }
+    return this.toolsService.md5(text);
   }
 }
