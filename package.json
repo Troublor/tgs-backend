@@ -41,7 +41,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.3.0",
-    "telegraf": "^4.5.2",
+    "telegraf": "^4.6.0",
     "ts-md5": "^1.2.10",
     "uuid": "^8.3.2",
     "winston": "^3.4.0"
