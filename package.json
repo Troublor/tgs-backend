@@ -28,7 +28,7 @@
     "@nestjs/serve-static": "^2.2.2",
     "@nestjs/swagger": "^5.1.5",
     "@troubkit/log": "^0.4.0",
-    "axios": "^0.24.0",
+    "axios": "^0.25.0",
     "escodegen": "^2.0.0",
     "esprima": "^4.0.1",
     "express": "^4.17.2",
