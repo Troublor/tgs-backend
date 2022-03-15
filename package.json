@@ -59,7 +59,7 @@
     "@types/supertest": "^2.0.11",
     "@types/swagger-ui-express": "^4",
     "@types/uuid": "^8",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
