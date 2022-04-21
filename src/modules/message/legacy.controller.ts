@@ -13,7 +13,7 @@ import {
 } from '@nestjs/swagger';
 import UserService from '../database/user.service.js';
 import MessageService from './message.service.js';
-import { PlainBody } from '../plain-body.decorator';
+import { PlainBody } from '../plain-body.decorator.js';
 
 @Controller()
 export default class LegacyController {
