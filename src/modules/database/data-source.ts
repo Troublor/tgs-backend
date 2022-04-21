@@ -10,7 +10,7 @@ const commonOpts: Partial<DataSourceOptions> = {
   logging: true,
   synchronize: false,
   entities: [User, Jwt, TelegramChat, Email, Message],
-  migrations: ['migrations/*.ts'],
+  migrations: ['src/modules/database/migrations/*.{ts.js}'],
   subscribers: [],
 };
 
