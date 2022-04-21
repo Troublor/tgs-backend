@@ -9,11 +9,11 @@ import {
   Req,
   UseFilters,
 } from '@nestjs/common';
-import ToolsService from './tools.service';
+import ToolsService from './tools.service.js';
 import axios from 'axios';
 import _ from 'lodash';
 import { ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
-import RESTfulExceptionFilter from '../RESTful.middleware';
+import RESTfulExceptionFilter from '../RESTful.middleware.js';
 import { Request } from 'express';
 import rawBody from 'raw-body';
 

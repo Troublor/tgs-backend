@@ -2,24 +2,23 @@ import {
   BeforeApplicationShutdown,
   Inject,
   Injectable,
-  NotFoundException,
   OnApplicationBootstrap,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Telegraf } from 'telegraf';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import UserChatMapService, { UserId } from './user-chat-map.service';
+import UserService from '../database/user.service.js';
 
 @Injectable()
 export default class NotifierBotService
   implements OnApplicationBootstrap, BeforeApplicationShutdown
 {
-  private readonly bot: Telegraf;
+  private readonly bot: Telegraf | undefined;
   constructor(
     private readonly configService: ConfigService,
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private readonly userChatMap: UserChatMapService,
+    private readonly userService: UserService,
   ) {
     this.logger = logger.child({ module: 'NotifierBot' });
     const botToken = configService.get('notifier-bot.token');
@@ -31,6 +30,7 @@ export default class NotifierBotService
   }
 
   private async launch() {
+    if (!this.bot) return;
     this.bot.use(async (ctx, next) => {
       this.logger.debug('Got message from telegram', {
         msg: ctx.message,
@@ -39,70 +39,82 @@ export default class NotifierBotService
       await next(); // runs next middleware
     });
 
-    this.bot.command('status', (ctx) => {
+    this.bot.command('status', async (ctx) => {
       if (!ctx.message) return;
       const chatId = ctx.message.chat.id;
-      if (this.userChatMap.hasChat(chatId)) {
-        ctx.reply(
-          `Current chat is linked to userId: ${this.userChatMap.getUser(
-            chatId,
-          )}`,
-        );
+      const user = await this.userService.getUserByTelegramChatID(chatId);
+      if (user) {
+        ctx.reply(`Current chat is linked to username: ${user.username}`);
       } else {
         ctx.reply(
-          'Current chat is not linked to any userId. Use /link command to link to a userId.',
+          'Current chat is not linked to any username. Use /link command to link to a username.',
         );
       }
     });
 
-    this.bot.command('link', (ctx) => {
+    this.bot.command('link', async (ctx) => {
       if (!ctx.message) return;
       const chatId = ctx.message.chat.id;
       const args = ctx.message.text.split(/\s/).filter((s) => s.length > 0);
       if (args.length < 2) {
-        ctx.reply('Invalid format. Please use the format: /link <userId>');
+        ctx.reply(
+          'Invalid format. Please use the format: /link <username> <password>',
+        );
         return;
       }
-      const userId = args[1];
-      this.userChatMap.addChat(chatId, userId);
-      ctx.reply(`Linked current chat to userId: ${userId}`);
-      this.logger.info(`Linked chat ${chatId} to userId: ${userId}`);
-    });
-
-    this.bot.command('unlink', (ctx) => {
-      if (!ctx.message) return;
-      const chatId = ctx.message.chat.id;
-      if (this.userChatMap.hasChat(chatId)) {
-        const userId = this.userChatMap.getUser(chatId);
-        this.userChatMap.deleteChat(chatId);
-        ctx.reply(`Unlinked current chat from userId: ${userId}`);
+      const username = args[1];
+      const user = await this.userService.getUser(username);
+      if (user) {
+        if (user.requireAuth) {
+          const password = args[2];
+          if (!password || !user.verify(password)) {
+            ctx.reply(`Invalid username or password`);
+            return;
+          }
+        }
+        await this.userService.bindTelegramChat(user, chatId);
+        ctx.reply(`Linked current chat to username: ${username}`);
+        this.logger.info(`Linked chat ${chatId} to username: ${username}`);
       } else {
-        ctx.reply('Current chat is not linked to any userId.');
+        ctx.reply(`username does not exist`);
       }
     });
 
-    const serverDomain = 'https://troublor.xyz';
+    this.bot.command('unlink', async (ctx) => {
+      if (!ctx.message) return;
+      const chatId = ctx.message.chat.id;
+      const user = await this.userService.getUserByTelegramChatID(chatId);
+      if (user) {
+        await this.userService.unbindTelegramChat(chatId, user);
+        ctx.reply(`Unlinked current chat from username: ${user.username}`);
+      } else {
+        ctx.reply('Current chat is not linked to any username.');
+      }
+    });
+
+    const serverDomain = 'https://tgs.dns.troublor.xyz';
     this.bot.command('help', (ctx) => {
       const helpMessage = `Telegram Notification Service.
-    Making it possible to programmably send telegram notifications programmatically. 
-Usage: 
-    /link current chat to a specific userId. You can use any string.
-    In your program running on servers, send HTTP request to the RESTful API below with the userId. 
+    Making it possible to programmably send telegram notifications programmatically.
+Usage:
+    /link current chat to a specific username. You can use any string.
+    In your program running on servers, send HTTP request to the RESTful API below with the username.
     You will get notifications with the message sent from your program here!
-Availability: 
+Availability:
     The service is deployed on ${serverDomain}.
 RESTful API:
     GET Method
-      curl -X 'GET' ${serverDomain}/telegram/notify/<userId>/<message>
+      curl -X 'GET' ${serverDomain}/message/telegram/<username>/<message>
     POST Method
-      curl -X 'POST' ${serverDomain}/telegram/notify/<userId> -H 'Content-Type: text/plain' -d '<message>'
-Commands: 
-    /link <userId> - link current chat to a specific userId.
-                     You can use the RESTful API to send notification programmatically.
-                     E.g., /link myId
+      curl -X 'POST' ${serverDomain}/message/telegram/<username> -H 'Content-Type: text/plain' -d '<message>'
+Commands:
+    /link <username> [<password>] - link current chat to a specific username.
+                     The password is not needed if your user is configured not to require authentication.
+                     Then, you can use the RESTful API to send notification programmatically.
+                     E.g., /link myId myPass
                            In any program, call the restful API, you will get notification here on Telegram.
-    /status - show the userId that current chat is linked to.
-    /unlink - unlink current chat from userId. You will not receive notification anymore.
+    /status - show the username that current chat is linked to.
+    /unlink - unlink current chat from username. You will not receive notification anymore.
     /help - show this usage.`;
       ctx.reply(helpMessage);
     });
@@ -117,26 +129,9 @@ Commands:
     await this.bot.launch();
   }
 
-  sendMessage(userId: UserId, msg: string) {
-    const chats = this.userChatMap.getChats(userId);
-    if (chats.length <= 0) {
-      throw new NotFoundException('no chat available to send message');
-    }
-    for (const chat of chats) {
-      this.bot.telegram
-        .sendMessage(chat, msg)
-        .then(() => {
-          this.logger.debug(
-            `Sent message to user '${userId}': to=${chat} msg=${msg}`,
-          );
-        })
-        .catch((e) => {
-          this.logger.error(
-            `Failed to send message to user '${userId}': ${e.toString()}`,
-          );
-        });
-    }
-    this.logger.info(`Served notification of user '${userId}': ${msg}`);
+  async sendMessage(chatID: number, msg: string) {
+    if (!this.bot) throw new Error('bot not available');
+    await this.bot?.telegram.sendMessage(chatID, msg);
   }
 
   shutdown(signal?: string) {
@@ -149,7 +144,9 @@ Commands:
         await this.launch();
         this.logger.info('Notifier bot is up and running.');
       } catch (e) {
-        this.logger.error(`Failed to start bot`, { err: e.toString() });
+        this.logger.error(`Failed to start bot`, {
+          err: (e as Error).toString(),
+        });
       }
     } else {
       this.logger.warn('Notifier bot is not initialized.');

@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Md5 } from 'ts-md5';
 import { v1 as uuid } from 'uuid';
 import { spawnSync } from 'child_process';
-
-const esprima = require('esprima');
-const escodegen = require('escodegen');
-const fs = require('fs');
+import fs from 'fs';
 
 export enum HttpMethod {
   GET,
@@ -33,18 +30,6 @@ export default class ToolsService {
       description:
         'get the first two characters of the md5 hash of the payload',
     },
-    '3': {
-      httpMethod: HttpMethod.POST,
-      contentType: 'text/plain',
-      method: this.js2Ast.bind(this),
-      description: 'convert JavaScript code into ast (Abstract Syntax Tree)',
-    },
-    '4': {
-      httpMethod: HttpMethod.POST,
-      contentType: 'application/json',
-      method: this.ast2Js.bind(this),
-      description: 'convert ast (Abstract Syntax Tree) into JavaScript code',
-    },
     '5': {
       httpMethod: HttpMethod.POST,
       contentType: 'plain/text',
@@ -60,14 +45,6 @@ export default class ToolsService {
   public md5first2(payload: string): string {
     const md5string = <string>Md5.hashStr(payload);
     return md5string.substr(0, 2);
-  }
-
-  public js2Ast(payload: string): string {
-    return JSON.stringify(esprima.parseModule(payload, {}), null, 2);
-  }
-
-  public ast2Js(payload: string): string {
-    return escodegen.generate(payload);
   }
 
   public exeJs(payload: string): string {

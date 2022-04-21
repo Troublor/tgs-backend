@@ -8,13 +8,13 @@ import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import path from 'path';
-import { appRoot } from './config/loader';
+import { appRoot } from './config/loader.js';
 
 @Catch(HttpException)
 export default class HttpExceptionFilter
   implements ExceptionFilter<HttpException>
 {
-  constructor(private configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {}
 
   catch(exception: HttpException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -22,8 +22,8 @@ export default class HttpExceptionFilter
     const status = exception.getStatus();
 
     if (status == 404) {
-      response.status(200).send(
-        fs.readFileSync(
+      try {
+        const frontend = fs.readFileSync(
           path.join(
             appRoot,
             this.configService.get<string>('frontend') as string,
@@ -32,8 +32,16 @@ export default class HttpExceptionFilter
           {
             encoding: 'utf-8',
           },
-        ),
-      );
+        );
+        response.status(200).send(frontend);
+      } catch (e) {
+        console.error('Failed to serve frontend', { err: e });
+        response.status(404).send({
+          statusCode: status,
+          timestamp: new Date().toISOString(),
+          message: exception.message,
+        });
+      }
     } else {
       response.status(status).send({
         statusCode: status,

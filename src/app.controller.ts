@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import fs from 'fs';
 import * as path from 'path';
-import { appRoot } from './config/loader';
+import { appRoot } from './config/loader.js';
 
 @Controller('/')
 export class AppController {

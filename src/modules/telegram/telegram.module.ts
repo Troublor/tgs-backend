@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TelegramController } from './telegram.controller';
-import UserChatMapService from './user-chat-map.service';
-import NotifierBotService from './notifier-bot.service';
+import { TelegramController } from './telegram.controller.js';
+import NotifierBotService from './notifier-bot.service.js';
+import DatabaseModule from '../database/database.module.js';
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [TelegramController],
-  providers: [UserChatMapService, NotifierBotService],
+  providers: [NotifierBotService],
+  exports: [NotifierBotService],
 })
 export class TelegramModule {}

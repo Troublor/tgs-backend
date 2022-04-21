@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
-import ToolsModule from './modules/tools/tools.module';
+import ToolsModule from './modules/tools/tools.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configLoader, { appRoot } from './config/loader';
-import { FrontendModule } from './modules/frontend/frontend.module';
-import { AppController } from './app.controller';
+import configLoader, { appRoot } from './config/loader.js';
+import { FrontendModule } from './modules/frontend/frontend.module.js';
+import { AppController } from './app.controller.js';
 import { WinstonModule } from 'nest-winston';
 import winston from 'winston';
 import { structured } from '@troubkit/log';
 import * as path from 'path';
-import { TelegramModule } from './modules/telegram/telegram.module';
+import { TelegramModule } from './modules/telegram/telegram.module.js';
+import DatabaseModule from './modules/database/database.module.js';
+import AuthModule from './modules/auth/auth.module.js';
+import MessageModule from './modules/message/message.module.js';
 
 @Module({
   imports: [
@@ -38,7 +41,10 @@ import { TelegramModule } from './modules/telegram/telegram.module';
         };
       },
     }),
+    DatabaseModule,
+    AuthModule,
     FrontendModule,
+    MessageModule,
     ToolsModule,
     TelegramModule,
   ],

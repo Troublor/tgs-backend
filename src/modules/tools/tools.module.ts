@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import ToolsController from './tools.controller';
-import ToolsService from './tools.service';
+import ToolsController from './tools.controller.js';
+import ToolsService from './tools.service.js';
 
 @Module({
   imports: [],

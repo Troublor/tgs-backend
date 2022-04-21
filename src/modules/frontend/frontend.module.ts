@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import path from 'path';
-import { appRoot } from '../../config/loader';
+import { appRoot } from '../../config/loader.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigService } from '@nestjs/config';
 

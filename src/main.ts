@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import AppModule from './app.module';
-import HttpExceptionFilter from './http-exception.filter';
-import JsExceptionFilter from './js-exception.filter';
+import AppModule from './app.module.js';
+import HttpExceptionFilter from './http-exception.filter.js';
+import JsExceptionFilter from './js-exception.filter.js';
 import express from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@nestjs/platform-express';
