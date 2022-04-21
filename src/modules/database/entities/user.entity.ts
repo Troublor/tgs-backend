@@ -27,10 +27,10 @@ export default class User {
   })
   requireAuth!: boolean;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   createdAt!: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   updatedAt!: Date;
 
   @BeforeInsert()

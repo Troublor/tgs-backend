@@ -12,7 +12,6 @@ import Email from './email.entity.js';
 import TelegramChat from './telegram-chat.entity.js';
 
 @Entity()
-@Check(`NOT "email" IS NULL OR "telegramChat" IS NOT NULL`)
 @Check(`"content" NOT LIKE ''`)
 export default class Message {
   @PrimaryGeneratedColumn()
@@ -21,7 +20,7 @@ export default class Message {
   @Column({ type: 'text' })
   content!: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   sentAt!: Date;
 
   @ManyToMany(() => Email, (email) => email.messages, { eager: true })

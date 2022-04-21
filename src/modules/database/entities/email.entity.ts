@@ -18,7 +18,7 @@ export default class Email {
   @Column({ type: Boolean, default: false })
   verified!: boolean;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   bindAt!: Date;
 
   @ManyToOne(() => User, (user) => user.emails, { eager: true })

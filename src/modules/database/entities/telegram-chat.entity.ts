@@ -15,7 +15,7 @@ export default class TelegramChat {
   @PrimaryColumn({ type: Number })
   id!: number;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   bindAt!: Date;
 
   @ManyToOne(() => User, (user) => user.telegramChats, { eager: true })

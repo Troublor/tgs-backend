@@ -16,10 +16,10 @@ export default class Jwt {
   @Column({ type: String })
   description!: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   createdAt!: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   expireAt!: Date | null; // null mean no expire time
 
   @BeforeInsert()
