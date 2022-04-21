@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export const configSchema = Joi.object({
   port: Joi.number().required(),
-  httpsPort: Joi.number().required(),
+  httpsPort: Joi.number(),
   log: Joi.object({
     level: Joi.string().valid('debug', 'info', 'warn', 'error').default('info'),
     file: Joi.string(),

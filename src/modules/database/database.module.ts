@@ -6,6 +6,7 @@ import UserService from './user.service.js';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import JwtService from './jwt.service.js';
+import UrlService from './url.service.js';
 
 @Module({
   imports: [
@@ -16,8 +17,8 @@ import JwtService from './jwt.service.js';
       }),
     }),
   ],
-  providers: [UserService, JwtService],
-  exports: [UserService, JwtService],
+  providers: [UserService, JwtService, UrlService],
+  exports: [UserService, JwtService, UrlService],
 })
 export default class DatabaseModule implements OnModuleInit, OnModuleDestroy {
   constructor(

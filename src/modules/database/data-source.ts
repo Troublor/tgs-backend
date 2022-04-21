@@ -5,18 +5,18 @@ import Jwt from './entities/jwt.entity.js';
 import TelegramChat from './entities/telegram-chat.entity.js';
 import Email from './entities/email.entity.js';
 import Message from './entities/message.entity.js';
+import Url from './entities/url.entity.js';
 
 const commonOpts: Partial<DataSourceOptions> = {
-  logging: true,
+  logging: false,
   synchronize: false,
-  entities: [User, Jwt, TelegramChat, Email, Message],
-  migrations: ['src/modules/database/migrations/*.{ts.js}'],
+  entities: [User, Jwt, TelegramChat, Email, Message, Url],
   subscribers: [],
 };
 
 const options: DataSourceOptions = {
   type: 'postgres',
-  host: 'localhost',
+  host: '127.0.0.1',
   port: 5432,
   username: 'troublor',
   password: '',
@@ -30,8 +30,10 @@ const DefaultDataSource = new DataSource({
 
 export const TestDataSource = new DataSource({
   ...commonOpts,
-  type: 'sqljs',
+  ...options,
+  database: 'tgs-test',
   synchronize: true,
+  migrations: ['./src/**/migrations/*.ts'],
 } as DataSourceOptions);
 
 export let AppData = DefaultDataSource;

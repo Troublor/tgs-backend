@@ -12,6 +12,7 @@ import { TelegramModule } from './modules/telegram/telegram.module.js';
 import DatabaseModule from './modules/database/database.module.js';
 import AuthModule from './modules/auth/auth.module.js';
 import MessageModule from './modules/message/message.module.js';
+import UrlModule from './modules/url/url.module.js';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import MessageModule from './modules/message/message.module.js';
     AuthModule,
     FrontendModule,
     MessageModule,
+    UrlModule,
     ToolsModule,
     TelegramModule,
   ],

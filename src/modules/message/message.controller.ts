@@ -1,12 +1,10 @@
 import {
   BadRequestException,
-  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
   Post,
-  Req,
 } from '@nestjs/common';
 import UserService from '../database/user.service.js';
 import {
@@ -14,9 +12,8 @@ import {
   ApiConsumes,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
-import { Request } from 'express';
-import rawBody from 'raw-body';
 import MessageService from './message.service.js';
+import { PlainBody } from '../plain-body.decorator.js';
 
 @Controller('/message')
 export default class MessageController {
@@ -30,18 +27,13 @@ export default class MessageController {
   @ApiBadRequestResponse({ description: 'Empty message to send' })
   @ApiNotFoundResponse({ description: 'No chat associated with username' })
   async sendMessage(
-    @Body() body: string,
-    @Req() req: Request,
+    @PlainBody() raw: string,
     @Param('username') username: string,
     @Param('message') msg?: string,
   ) {
-    if (!req.body && !msg) {
-      throw new BadRequestException(new Error('empty message'));
-    }
-    const raw = await rawBody(req);
     let text = '';
     if (msg) text += msg + '\n';
-    if (req.body) text += raw.toString();
+    text += raw;
     text = text.trim();
     if (text.length == 0) {
       throw new BadRequestException(new Error('empty message'));
