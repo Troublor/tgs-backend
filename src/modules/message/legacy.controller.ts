@@ -38,7 +38,10 @@ export default class LegacyController {
       throw new NotFoundException(e);
     }
     if (count > 0) {
-      return `Message sent to user '${username}': \n${msg}`;
+      return `**NOTICE: this API is deprecated.
+      Use "curl -X POST https://troublor.xyz/message/telegram/<username>[/<message>] -H ['Content-Type: text/plain' -d <message>]" instead.
+
+      Message sent to user '${username}': \n${msg}`;
     } else {
       throw new NotFoundException('No chat associated with username');
     }
