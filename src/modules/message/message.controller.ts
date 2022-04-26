@@ -5,6 +5,8 @@ import {
   NotFoundException,
   Param,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import UserService from '../database/user.service.js';
 import {
@@ -14,6 +16,9 @@ import {
 } from '@nestjs/swagger';
 import MessageService from './message.service.js';
 import { PlainBody } from '../plain-body.decorator.js';
+import JwtAuthGuard from '../auth/jwt-auth.guard.js';
+import { Request } from 'express';
+import User from '../database/entities/user.entity.js';
 
 @Controller('/message')
 export default class MessageController {
@@ -53,12 +58,10 @@ export default class MessageController {
     }
   }
 
-  @Get('/telegram/:username')
-  async getMessage(
-    @Param('username') username: string,
-  ): Promise<Record<string, unknown>[]> {
-    const user = await this.userService.getUser(username);
-    if (!user) throw new NotFoundException('username not found');
+  @Get('/telegram')
+  @UseGuards(JwtAuthGuard)
+  async getMessage(@Req() req: Request): Promise<Record<string, unknown>[]> {
+    const user = req.user as User;
     const history = await this.userService.getMessages(user, {
       telegramChat: true,
     });

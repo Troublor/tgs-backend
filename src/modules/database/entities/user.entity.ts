@@ -11,21 +11,15 @@ import Jwt from './jwt.entity.js';
 import { createHash } from 'crypto';
 import TelegramChat from './telegram-chat.entity.js';
 import Email from './email.entity.js';
+import Message from './message.entity.js';
 
 @Entity()
 export default class User {
   @PrimaryColumn({ type: String })
   username!: string;
 
-  @Column({ type: String })
-  password!: string;
-
-  @Column({
-    type: Boolean,
-    default: false,
-    comment: 'require authentication',
-  })
-  requireAuth!: boolean;
+  @Column({ type: String, nullable: true })
+  password!: string | null;
 
   @Column({ type: 'timestamp' })
   createdAt!: Date;
@@ -59,13 +53,22 @@ export default class User {
   })
   emails!: Relation<Email>[];
 
+  @OneToMany(() => Message, (message) => message.receiver, {
+    cascade: ['remove'],
+  })
+  messages!: Relation<Message>[];
+
   static hashPassword(password: string): string {
     const hash = createHash('sha256');
     hash.update(password);
     return hash.digest('hex');
   }
 
-  verify(password: string): boolean {
-    return this.password === User.hashPassword(password);
+  verify(password?: string): boolean {
+    if (this.password) {
+      return !!password && this.password === User.hashPassword(password);
+    } else {
+      return true;
+    }
   }
 }

@@ -8,7 +8,8 @@ export default class NewUserDto {
 
   @ApiProperty()
   @IsString()
-  password!: string;
+  @IsOptional()
+  password?: string;
 
   @ApiProperty()
   @IsEmail()

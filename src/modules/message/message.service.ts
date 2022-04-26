@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import User from '../database/entities/user.entity.js';
 import NotifierBotService from '../telegram/notifier-bot.service.js';
 import UserService from '../database/user.service.js';
+import TelegramChat from '../database/entities/telegram-chat.entity.js';
 
 @Injectable()
 export default class MessageService {
@@ -13,9 +14,13 @@ export default class MessageService {
     const message = await this.userService.saveMessage(user, msg, {
       telegramChat: true,
     });
-    for (const chat of message.telegramChats) {
-      await this.notifierBotService.sendMessage(chat.id, msg);
+    const destinations = message.destinations.filter((d) => !!d.telegramChat);
+    for (const dest of destinations) {
+      await this.notifierBotService.sendMessage(
+        (dest.telegramChat as TelegramChat).id,
+        msg,
+      );
     }
-    return message.telegramChats.length;
+    return destinations.length;
   }
 }

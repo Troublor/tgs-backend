@@ -6,11 +6,12 @@ import TelegramChat from './entities/telegram-chat.entity.js';
 import Email from './entities/email.entity.js';
 import Message from './entities/message.entity.js';
 import Url from './entities/url.entity.js';
+import MessageDestination from './entities/message-destination.entity.js';
 
 const commonOpts: Partial<DataSourceOptions> = {
   logging: false,
   synchronize: false,
-  entities: [User, Jwt, TelegramChat, Email, Message, Url],
+  entities: [User, Jwt, TelegramChat, Email, Message, Url, MessageDestination],
   subscribers: [],
 };
 
@@ -26,6 +27,9 @@ const options: DataSourceOptions = {
 const DefaultDataSource = new DataSource({
   ...commonOpts,
   ...options,
+  migrations: process.env['MIGRATION']
+    ? ['./src/modules/database/migrations/*.ts']
+    : [],
 } as DataSourceOptions);
 
 export const TestDataSource = new DataSource({

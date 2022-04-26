@@ -2,18 +2,18 @@ import {
   BeforeInsert,
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   Relation,
 } from 'typeorm';
 import User from './user.entity.js';
-import Message from './message.entity.js';
+import MessageDestination from './message-destination.entity.js';
 
 @Entity()
 export default class TelegramChat {
-  @PrimaryColumn({ type: Number })
-  id!: number;
+  @PrimaryColumn({ type: String })
+  id!: string;
 
   @Column({ type: 'timestamp' })
   bindAt!: Date;
@@ -21,8 +21,8 @@ export default class TelegramChat {
   @ManyToOne(() => User, (user) => user.telegramChats, { eager: true })
   user!: Relation<User>;
 
-  @ManyToMany(() => Message, (msg) => msg.telegramChats)
-  messages!: Relation<Message>[];
+  @OneToMany(() => MessageDestination, (dist) => dist.email)
+  mapToMessages!: Relation<MessageDestination>[];
 
   @BeforeInsert()
   beforeInsert() {

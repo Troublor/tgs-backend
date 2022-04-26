@@ -5,6 +5,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import TelegramChat from './entities/telegram-chat.entity.js';
 import Email from './entities/email.entity.js';
 import Message from './entities/message.entity.js';
+import MessageDestination from './entities/message-destination.entity.js';
 
 @Injectable()
 export default class UserService {
@@ -24,16 +25,16 @@ export default class UserService {
     return await this.userRepo.findOne({ where: { username: username } });
   }
 
-  async createUser(username: string, password: string): Promise<User> {
+  async createUser(username: string, password?: string): Promise<User> {
     const user = this.userRepo.create({
       username: username,
-      password: User.hashPassword(password),
+      password: password ? User.hashPassword(password) : null,
     });
     await this.userRepo.save(user);
     return user;
   }
 
-  async bindTelegramChat(user: User, chatID: number): Promise<TelegramChat> {
+  async bindTelegramChat(user: User, chatID: string): Promise<TelegramChat> {
     const chat = this.telegramChatRepo.create({
       id: chatID,
       user: user,
@@ -51,7 +52,7 @@ export default class UserService {
     return emailEntity;
   }
 
-  async unbindTelegramChat(chatID: number, user?: User): Promise<boolean> {
+  async unbindTelegramChat(chatID: string, user?: User): Promise<boolean> {
     let r: DeleteResult;
     if (user) {
       r = await this.telegramChatRepo.delete({
@@ -86,20 +87,46 @@ export default class UserService {
       throw new Error('cannot send message to nowhere');
     const msg = this.messageRepo.create({
       content: message,
+      receiver: user,
     });
-    const userWithRelations = await this.userRepo.findOne({
-      where: {
-        username: user.username,
-      },
-      relations: {
-        emails: true,
-        telegramChats: true,
-      },
+    await AppData.manager.transaction(async (manager) => {
+      const userWithRelations = await this.userRepo.findOne({
+        where: {
+          username: user.username,
+        },
+        relations: {
+          emails: true,
+          telegramChats: true,
+        },
+      });
+
+      await manager.save(msg);
+      if (!userWithRelations) throw new Error('user not found');
+      if (email) {
+        const destinations = userWithRelations.emails.map((e) =>
+          manager.create(MessageDestination, {
+            message: msg,
+            email: e,
+          }),
+        );
+        msg.destinations = msg.destinations
+          ? msg.destinations.concat(destinations)
+          : destinations;
+        await manager.save(destinations);
+      }
+      if (telegramChat) {
+        const destinations = userWithRelations.telegramChats.map((c) =>
+          manager.create(MessageDestination, {
+            message: msg,
+            telegramChat: c,
+          }),
+        );
+        msg.destinations = msg.destinations
+          ? msg.destinations.concat(destinations)
+          : destinations;
+        await manager.save(destinations);
+      }
     });
-    if (!userWithRelations) throw new Error('user not found');
-    if (email) msg.emails = [...userWithRelations.emails];
-    if (telegramChat) msg.telegramChats = [...userWithRelations.telegramChats];
-    await this.messageRepo.save(msg);
     return msg;
   }
 
@@ -112,12 +139,12 @@ export default class UserService {
       relations: {
         emails: email
           ? {
-              messages: true,
+              mapToMessages: true,
             }
           : false,
         telegramChats: telegramChat
           ? {
-              messages: true,
+              mapToMessages: true,
             }
           : false,
       },
@@ -127,7 +154,7 @@ export default class UserService {
     if (email) {
       messages.push(
         ...userWithRelations.emails.reduce(
-          (acc, e) => acc.concat(e.messages),
+          (acc, e) => acc.concat(e.mapToMessages.map((m) => m.message)),
           [] as Message[],
         ),
       );
@@ -135,7 +162,7 @@ export default class UserService {
     if (telegramChat) {
       messages.push(
         ...userWithRelations.telegramChats.reduce(
-          (acc, e) => acc.concat(e.messages),
+          (acc, e) => acc.concat(e.mapToMessages.map((m) => m.message)),
           [] as Message[],
         ),
       );
@@ -143,7 +170,7 @@ export default class UserService {
     return messages;
   }
 
-  async getUserByTelegramChatID(chatID: number): Promise<User | null> {
+  async getUserByTelegramChatID(chatID: string): Promise<User | null> {
     const chat = await this.telegramChatRepo.findOne({
       where: {
         id: chatID,

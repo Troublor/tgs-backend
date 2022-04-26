@@ -42,7 +42,9 @@ export default class NotifierBotService
     this.bot.command('status', async (ctx) => {
       if (!ctx.message) return;
       const chatId = ctx.message.chat.id;
-      const user = await this.userService.getUserByTelegramChatID(chatId);
+      const user = await this.userService.getUserByTelegramChatID(
+        chatId.toString(),
+      );
       if (user) {
         ctx.reply(`Current chat is linked to username: ${user.username}`);
       } else {
@@ -58,34 +60,35 @@ export default class NotifierBotService
       const args = ctx.message.text.split(/\s/).filter((s) => s.length > 0);
       if (args.length < 2) {
         ctx.reply(
-          'Invalid format. Please use the format: /link <username> <password>',
+          'Invalid format. Please use the format: /link <username> [<password>]',
         );
         return;
       }
       const username = args[1];
-      const user = await this.userService.getUser(username);
-      if (user) {
-        if (user.requireAuth) {
-          const password = args[2];
-          if (!password || !user.verify(password)) {
-            ctx.reply(`Invalid username or password`);
-            return;
-          }
-        }
-        await this.userService.bindTelegramChat(user, chatId);
-        ctx.reply(`Linked current chat to username: ${username}`);
-        this.logger.info(`Linked chat ${chatId} to username: ${username}`);
-      } else {
-        ctx.reply(`username does not exist`);
+      let user = await this.userService.getUser(username);
+      if (!user) {
+        user = await this.userService.createUser(username);
+        // create new user without password
+        ctx.reply(`Username does not exist.\nCreated new user '${username}'.`);
       }
+      const password = args[2];
+      if (user.password && (!password || !user.verify(password))) {
+        ctx.reply(`Invalid username or password`);
+        return;
+      }
+      await this.userService.bindTelegramChat(user, chatId.toString());
+      ctx.reply(`Linked current chat to username: ${username}`);
+      this.logger.info(`Linked chat ${chatId} to username: ${username}`);
     });
 
     this.bot.command('unlink', async (ctx) => {
       if (!ctx.message) return;
       const chatId = ctx.message.chat.id;
-      const user = await this.userService.getUserByTelegramChatID(chatId);
+      const user = await this.userService.getUserByTelegramChatID(
+        chatId.toString(),
+      );
       if (user) {
-        await this.userService.unbindTelegramChat(chatId, user);
+        await this.userService.unbindTelegramChat(chatId.toString(), user);
         ctx.reply(`Unlinked current chat from username: ${user.username}`);
       } else {
         ctx.reply('Current chat is not linked to any username.');
@@ -109,7 +112,7 @@ RESTful API:
       curl -X 'POST' ${serverDomain}/message/telegram/<username> -H 'Content-Type: text/plain' -d '<message>'
 Commands:
     /link <username> [<password>] - link current chat to a specific username.
-                     The password is not needed if your user is configured not to require authentication.
+                     The password is not needed if your user has not configured a password.
                      Then, you can use the RESTful API to send notification programmatically.
                      E.g., /link myId myPass
                            In any program, call the restful API, you will get notification here on Telegram.
@@ -129,9 +132,14 @@ Commands:
     await this.bot.launch();
   }
 
-  async sendMessage(chatID: number, msg: string) {
+  async sendMessage(chatID: string, msg: string) {
     if (!this.bot) throw new Error('bot not available');
-    await this.bot?.telegram.sendMessage(chatID, msg);
+    try {
+      const id = parseInt(chatID);
+      await this.bot?.telegram.sendMessage(id, msg);
+    } catch (e) {
+      await this.bot?.telegram.sendMessage(chatID, msg);
+    }
   }
 
   shutdown(signal?: string) {

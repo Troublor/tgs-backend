@@ -3,13 +3,13 @@ import {
   Check,
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import Email from './email.entity.js';
-import TelegramChat from './telegram-chat.entity.js';
+import User from './user.entity.js';
+import MessageDestination from './message-destination.entity.js';
 
 @Entity()
 @Check(`"content" NOT LIKE ''`)
@@ -23,13 +23,11 @@ export default class Message {
   @Column({ type: 'timestamp' })
   sentAt!: Date;
 
-  @ManyToMany(() => Email, (email) => email.messages, { eager: true })
-  @JoinTable()
-  emails!: Relation<Email>[];
+  @ManyToOne(() => User, (user) => user.messages, { eager: true })
+  receiver!: Relation<User>;
 
-  @ManyToMany(() => TelegramChat, (chat) => chat.messages, { eager: true })
-  @JoinTable()
-  telegramChats!: Relation<TelegramChat>[];
+  @OneToMany(() => MessageDestination, (dist) => dist.message)
+  destinations!: Relation<MessageDestination>[];
 
   @BeforeInsert()
   beforeInsert() {
@@ -37,12 +35,18 @@ export default class Message {
   }
 
   get jsonObject(): Record<string, unknown> {
+    const emails = this.destinations
+      .filter((d) => !!d.email)
+      .map((d) => d.email);
+    const chats = this.destinations
+      .filter((d) => !!d.telegramChat)
+      .map((d) => d.telegramChat);
     return {
       content: this.content,
       sentAt: this.sentAt.toString(),
       receivers: {
-        emails: this.emails.map((e) => e.email),
-        telegramChats: this.telegramChats.map((c) => c.id),
+        emails: emails,
+        telegramChats: chats,
       },
     };
   }

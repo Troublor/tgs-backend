@@ -56,6 +56,16 @@ export default class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete('/jwt/all')
+  async deleteAllTokens(@Req() req: Request) {
+    const user = req.user as User;
+    const jwts = await this.jwtService.get(user);
+    for (const jwt of jwts) {
+      await this.jwtService.delete(jwt.token);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete('/jwt/:jwt')
   async deleteToken(@Req() req: Request, @Param('jwt') jwt: string) {
     const user = req.user as User;
