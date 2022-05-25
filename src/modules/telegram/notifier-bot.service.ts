@@ -95,7 +95,7 @@ export default class NotifierBotService
       }
     });
 
-    const serverDomain = 'https://tgs.dns.troublor.xyz';
+    const serverDomain = 'https://api.troublor.xyz';
     this.bot.command('help', (ctx) => {
       const helpMessage = `Telegram Notification Service.
     Making it possible to programmably send telegram notifications programmatically.
