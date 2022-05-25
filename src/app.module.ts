@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import ToolsModule from './modules/tools/tools.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configLoader, { appRoot } from './config/loader.js';
-import { FrontendModule } from './modules/frontend/frontend.module.js';
 import { AppController } from './app.controller.js';
 import { WinstonModule } from 'nest-winston';
 import winston from 'winston';
@@ -44,7 +43,6 @@ import UrlModule from './modules/url/url.module.js';
     }),
     DatabaseModule,
     AuthModule,
-    FrontendModule,
     MessageModule,
     UrlModule,
     ToolsModule,

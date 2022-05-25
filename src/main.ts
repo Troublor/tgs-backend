@@ -28,10 +28,11 @@ async function bootstrap() {
   const port = configService.get<number>('port');
   const httpsPort = configService.get<number>('httpsPort');
   if (httpsPort) {
+    const caPath = configService.get<string>('ssl.ca');
     const httpsOptions = {
       key: fs.readFileSync(configService.get<string>('ssl.key') as string),
       cert: fs.readFileSync(configService.get<string>('ssl.cert') as string),
-      ca: fs.readFileSync(configService.get<string>('ssl.ca') as string),
+      ca: caPath && fs.readFileSync(caPath),
     };
     https.createServer(httpsOptions, server).listen(httpsPort);
   }
@@ -47,7 +48,7 @@ async function openAPI(app: INestApplication) {
     .addTag('tools')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api/', app, document);
+  SwaggerModule.setup('/', app, document);
 }
 
 bootstrap()
