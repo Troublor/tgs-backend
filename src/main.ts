@@ -9,13 +9,19 @@ import https from 'https';
 import fs from 'fs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import { buildWinstonConfig } from './logger';
+import Config from './config/schema';
 
 async function bootstrap() {
+  const logger = await WinstonModule.createLogger(buildWinstonConfig());
   const server = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    logger: logger,
+  });
 
   // configure
-  const configService: ConfigService = app.get(ConfigService);
+  const configService: ConfigService<Config, true> = app.get(ConfigService);
   // openAPI doc
   await openAPI(app);
 
@@ -25,19 +31,18 @@ async function bootstrap() {
   );
 
   // listen
-  const port = configService.get<number>('port');
-  const httpsPort = configService.get<number>('httpsPort');
-  if (httpsPort) {
-    const caPath = configService.get<string>('ssl.ca');
+  const port = configService.get('port', { infer: true });
+  const httpsConfig = configService.get('https', { infer: true });
+  if (httpsConfig) {
     const httpsOptions = {
-      key: fs.readFileSync(configService.get<string>('ssl.key') as string),
-      cert: fs.readFileSync(configService.get<string>('ssl.cert') as string),
-      ca: caPath && fs.readFileSync(caPath),
+      key: fs.readFileSync(httpsConfig.key),
+      cert: fs.readFileSync(httpsConfig.cert),
+      ca: httpsConfig.ca ? fs.readFileSync(httpsConfig.ca) : undefined,
     };
-    https.createServer(httpsOptions, server).listen(httpsPort);
+    https.createServer(httpsOptions, server).listen(httpsConfig.port);
   }
-  await app.listen(port as number);
-  console.log(`Server running on http://localhost:${port}`);
+  await app.listen(port);
+  logger.log(`Server listening on port://0.0.0.0:${port}`);
 }
 
 async function openAPI(app: INestApplication) {
@@ -51,10 +56,6 @@ async function openAPI(app: INestApplication) {
   SwaggerModule.setup('/', app, document);
 }
 
-bootstrap()
-  .then(() => {
-    console.log('Server started');
-  })
-  .catch((e) => {
-    console.error(e);
-  });
+bootstrap().catch((e) => {
+  console.error(e);
+});

@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  database:
+    image: postgres:13
+    ports:
+      - '5432:5432'
+    restart: always
+    environment:
+      - POSTGRES_USER=tgs
+      - POSTGRES_PASSWORD=
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=tgs
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - tgs-network
+
+  tgs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+    restart: always
+    volumes:
+      - ./config.docker.yaml:/app/config.yaml
+      - ./ssl:/ssl
+    networks:
+      - tgs-network
+
+volumes:
+  pg-data:
+
+networks:
+  tgs-network:

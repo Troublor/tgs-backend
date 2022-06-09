@@ -1,0 +1,13 @@
+/.github/
+
+/.yarn/cache
+/.yarn/unplugged
+/.yarn/install-state.g
+/node_modules/
+
+/http-tests/
+/src/
+
+/config.yaml
+/config.docker.yaml
+/*.log

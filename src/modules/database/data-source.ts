@@ -7,6 +7,11 @@ import Email from './entities/email.entity.js';
 import Message from './entities/message.entity.js';
 import Url from './entities/url.entity.js';
 import MessageDestination from './entities/message-destination.entity.js';
+import loader from '../../config/loader.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const commonOpts: Partial<DataSourceOptions> = {
   logging: false,
@@ -15,21 +20,14 @@ const commonOpts: Partial<DataSourceOptions> = {
   subscribers: [],
 };
 
-const options: DataSourceOptions = {
-  type: 'postgres',
-  host: '127.0.0.1',
-  port: 5432,
-  username: 'troublor',
-  password: '',
-  database: 'tgs',
-};
+const cfg = loader();
+const options: DataSourceOptions = cfg.database as DataSourceOptions;
 
 const DefaultDataSource = new DataSource({
   ...commonOpts,
   ...options,
-  migrations: process.env['MIGRATION']
-    ? ['./src/modules/database/migrations/*.ts']
-    : [],
+  logging: cfg.log.level == 'debug',
+  migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
 } as DataSourceOptions);
 
 export const TestDataSource = new DataSource({
