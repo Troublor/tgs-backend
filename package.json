@@ -10,6 +10,8 @@
     "typeorm": "typeorm-ts-node-esm",
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "docker:build": "docker build -t troublor/tgs:latest .",
+    "docker:push": "docker push troublor/tgs:latest",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
