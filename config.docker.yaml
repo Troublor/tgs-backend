@@ -8,9 +8,9 @@ database:
   username: tgs
   password: ''
   database: tgs
-#notifier-bot:
-#  token: 1898800830:AAGc5Z478ewCTQEaHLDh8HFThte59b7vDDE
+notifier-bot:
+  token: TOKEN
 https:
   port: 443
-  key: /ssl/tgs.key
-  cert: /ssl/tgs.crt
+  key: /ssl/troublor_xyz.key
+  cert: /ssl/troublor_xyz.crt
