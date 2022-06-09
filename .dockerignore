@@ -6,7 +6,6 @@
 /node_modules/
 
 /http-tests/
-/src/
 
 /config.yaml
 /config.docker.yaml

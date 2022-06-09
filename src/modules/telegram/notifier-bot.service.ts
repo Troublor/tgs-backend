@@ -9,6 +9,7 @@ import { Telegraf } from 'telegraf';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import UserService from '../database/user.service.js';
+import Config from '../../config/schema.js';
 
 @Injectable()
 export default class NotifierBotService
@@ -16,16 +17,16 @@ export default class NotifierBotService
 {
   private readonly bot: Telegraf | undefined;
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<Config, true>,
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private readonly userService: UserService,
   ) {
     this.logger = logger.child({ module: 'NotifierBot' });
-    const botToken = configService.get('notifier-bot.token');
-    if (!botToken) {
+    const botConfig = configService.get('telegram-bot', { infer: true });
+    if (!botConfig) {
       this.logger.warn('Telegram bot will not run since token is not set');
     } else {
-      this.bot = new Telegraf(botToken);
+      this.bot = new Telegraf(botConfig.token);
     }
   }
 
