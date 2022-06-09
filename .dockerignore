@@ -10,4 +10,6 @@
 
 /config.yaml
 /config.docker.yaml
+
+/docker-compose.yaml
 /*.log
