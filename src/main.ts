@@ -10,8 +10,8 @@ import fs from 'fs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
-import { buildWinstonConfig } from './logger';
-import Config from './config/schema';
+import { buildWinstonConfig } from './logger.js';
+import Config from './config/schema.js';
 
 async function bootstrap() {
   const logger = await WinstonModule.createLogger(buildWinstonConfig());
@@ -25,10 +25,7 @@ async function bootstrap() {
   // openAPI doc
   await openAPI(app);
 
-  app.useGlobalFilters(
-    new JsExceptionFilter(),
-    new HttpExceptionFilter(configService),
-  );
+  app.useGlobalFilters(new JsExceptionFilter(), new HttpExceptionFilter());
 
   // listen
   const port = configService.get('port', { infer: true });

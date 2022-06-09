@@ -10,6 +10,8 @@ import * as path from 'path';
 import DatabaseModule from './modules/database/database.module.js';
 import AuthModule from './modules/auth/auth.module.js';
 import UrlModule from './modules/url/url.module.js';
+import MessageModule from './modules/message/message.module.js';
+import { TelegramModule } from './modules/telegram/telegram.module.js';
 
 @Module({
   imports: [
@@ -41,10 +43,10 @@ import UrlModule from './modules/url/url.module.js';
     }),
     DatabaseModule,
     AuthModule,
-    // MessageModule,
+    MessageModule,
     UrlModule,
     ToolsModule,
-    // TelegramModule,
+    TelegramModule,
   ],
   controllers: [AppController],
 })

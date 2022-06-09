@@ -2,7 +2,7 @@ import { WinstonModuleOptions } from 'nest-winston';
 import winston from 'winston';
 import { structured } from '@troubkit/log';
 import path from 'path';
-import loader, { appRoot } from './config/loader';
+import loader, { appRoot } from './config/loader.js';
 
 export function buildWinstonConfig(): WinstonModuleOptions {
   const config = loader();

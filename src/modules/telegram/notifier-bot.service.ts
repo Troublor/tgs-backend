@@ -23,7 +23,7 @@ export default class NotifierBotService
     this.logger = logger.child({ module: 'NotifierBot' });
     const botToken = configService.get('notifier-bot.token');
     if (!botToken) {
-      this.logger.warn('Notifier bot token is not set');
+      this.logger.warn('Telegram bot will not run since token is not set');
     } else {
       this.bot = new Telegraf(botToken);
     }
